@@ -19,8 +19,8 @@ function Game() {
           className="h-72 m-auto opacity-50 animate-pulse"
         />
         <div
-          className="border-slate-600 border-2 h-36 w-48
-               flex flex-row justify-evenly items-center rounded-3xl
+          className="border-slate-600 border-2 h-36 w-56
+               flex flex-row justify-center items-center rounded-3xl
                shadow-inner shadow-slate-800 absolute top-5/12"
         >
           <img
@@ -31,12 +31,18 @@ function Game() {
           <img
             src={playCard}
             alt=""
-            className="h-28  rounded-lg shadow-md shadow-slate-800"
+            className="h-28  relative left-4"
           />
+
         </div>
-        <div className="absolute w-96  -rotate-90 top-80 right-3 ">
+
+        <div className="size-20 rounded-full bg-red-500 
+        absolute bottom-5/12 left-7/12 flex items-center justify-center shadow-inner shadow-slate-800 ">
+          <img src={uno} alt="uno-btn" className="h-12 animate-pulse delay-200 ease-in-out" />
+        </div>
+        <div className="absolute w-96  -rotate-90 top-80 right-5 ">
           <h5 className="relative bottom-3 font-bold">player2</h5>
-          <hr className="bg-slate-600  w-96 relative bottom-1" />
+          <hr className="bg-slate-600  w-96 relative bottom-3" />
           <div className="flex ">
             {[...Array(12)].map((_, index) => (
               <img
@@ -50,7 +56,7 @@ function Game() {
           </div>
         </div>
         <div className="absolute w-96 rotate-180 top-32">
-          <h5 className="relative bottom-3 font-bold">player3</h5>
+          <h5 className="relative bottom-3 font-bold rotate-180 right-80">player3</h5>
           <hr className="bg-slate-600  relative bottom-3 right" />
           <div className="flex  ">
             {[...Array(12)].map((_, index) => (
@@ -66,7 +72,7 @@ function Game() {
         </div>
         <div className="absolute w-96  rotate-90 left-5 top-80">
           <h5 className="relative bottom-3 font-bold">player4</h5>
-          <hr className="bg-slate-600  relative bottom-3 right" />
+          <hr className="bg-slate-600  relative bottom-3 " />
           <div className="flex  ">
             {[...Array(12)].map((_, index) => (
               <img

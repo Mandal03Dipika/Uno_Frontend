@@ -23,7 +23,7 @@ function Mode() {
       >
         <button
           onClick={() => showSetting()}
-          className="cursor-pointer z-50 font-extrabold text-2xl text-white p-5 rounded-2xl flex justify-center items-center shadow shadow-white bg-radial from-pink-400 from-40% to-fuchsia-700"
+          className="cursor-pointer z-50 "
         >
           <img
             src={setting}
