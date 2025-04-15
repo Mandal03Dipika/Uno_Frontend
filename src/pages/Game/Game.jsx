@@ -1,7 +1,7 @@
 import useGameContext from "./context/features/useGameContext";
 import uno from "../../assets/uno.png";
 import useThemeContext from "../../context/features/useThemeContext";
-
+import quitImg from "../../assets/quit.webp"
 function Game() {
   const {
     myDeck,
@@ -14,6 +14,8 @@ function Game() {
     handleColorSelect,
     colorMap,
     takeCard,
+    muteUnmute,
+    muteimg,
   } = useGameContext();
   const { theme } = useThemeContext();
 
@@ -24,6 +26,25 @@ function Game() {
                   bg-linear-to-r/oklab from-indigo-500 to-teal-400
                   flex flex-col items-center relative"
       >
+        <button
+          className="cursor-pointer z-50 "
+        >
+          <img
+            src={quitImg}
+            alt="quit"
+            className="absolute top-5 left-5 h-20 "
+          />
+        </button>
+        <button
+          onClick={() => muteUnmute()}
+          className="cursor-pointer z-50 "
+        >
+          <img
+            src={muteimg}
+            alt="sound"
+            className="absolute top-5 right-5 h-10 "
+          />
+        </button>
         <img
           src={uno}
           alt=""
@@ -58,9 +79,8 @@ function Game() {
           return (
             <div key={id} className={className}>
               <h5
-                className={`relative bottom-3 font-bold ${
-                  name === "Player 3" ? "-rotate-180 right-80" : ""
-                }`}
+                className={`relative bottom-3 font-bold ${name === "Player 3" ? "-rotate-180 right-80" : ""
+                  }`}
               >
                 {name}
               </h5>
@@ -80,8 +100,8 @@ function Game() {
           );
         })}
         <div className="absolute w-96 bottom-32 ">
-          <h5 className="relative bottom-3 font-bold">Player 1</h5>
-          <hr className="bg-slate-600 h-0.5 relative bottom-3 right" />
+          <h5 className="relative bottom-8 font-bold">Player 1</h5>
+          <hr className="bg-slate-600 h-0.5 relative bottom-8 right" />
           <div className="flex">
             {myDeck.map((card, index) => {
               const isPlayable = playableCards.some(
@@ -95,7 +115,8 @@ function Game() {
                   key={index}
                   src={card.image}
                   alt={`${card.color} ${card.value}`}
-                  className={`h-28 absolute transition-all duration-200 ease-in-out hover:scale-110 hover:cursor-pointer`}
+                  className={`h-28 absolute transition-all duration-200 ease-in-out 
+                    hover:scale-110 hover:cursor-pointer`}
                   style={{
                     left: `${index * 25}px`,
                     top: isPlayable ? "5px" : "22px",
@@ -110,14 +131,16 @@ function Game() {
           </div>
         </div>
         {showColorPicker && (
-          <div className="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-md">
+          <div className="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8
+          shadow-inner shadow-slate-500 rounded-3xl">
             <p className="mb-2 text-center font-bold">Choose a color:</p>
             <div className="flex justify-center gap-4">
               {["red", "blue", "green", "yellow"].map((color) => (
                 <button
                   key={color}
                   onClick={() => handleColorSelect(color)}
-                  className={`w-10 h-10 rounded-full ${colorMap[color]} hover:scale-110 transition`}
+                  className={`w-10 h-10 rounded-full animate-spin shadow-inner shadow-slate-800
+                     ${colorMap[color]} hover:scale-110 transition`}
                 />
               ))}
             </div>

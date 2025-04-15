@@ -61,6 +61,13 @@ import blueDraw2 from "../../../assets/blue-draw2.webp";
 import wild from "../../../assets/wild.webp";
 import draw4 from "../../../assets/draw4.webp";
 
+import moveSound1 from "../../../assets/moveSound1.wav"
+import useSound from 'use-sound';
+import soundOn from "../../../assets/soundOn.png";
+import soundOff from "../../../assets/soundOff.png";
+import gameSound1 from "../../../assets/gameSound1.mp3";
+
+
 const GameContextProvider = ({ children }) => {
   const [cards, setCards] = useState([]);
   const [playableCards, setPlayableCards] = useState([]);
@@ -70,6 +77,10 @@ const GameContextProvider = ({ children }) => {
   const [count, setCount] = useState();
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [pendingWildCard, setPendingWildCard] = useState(null);
+  const [moveSound] = useSound(moveSound1);
+  const [gameSound] = useSound(gameSound1);
+  const [mute, setMute] = useState(false);
+  const [muteimg, setMuteimg] = useState(soundOn);
 
   const getImage = (card) => {
     const { color, type, value } = card;
@@ -145,6 +156,11 @@ const GameContextProvider = ({ children }) => {
 
   const playCard = topCard ? getImage(topCard) : null;
 
+  const muteUnmute = () => {
+    setMute(!mute);
+    setMuteimg(muteimg === soundOn ? soundOff : soundOn);
+  }
+
   const updateLocalStateAfterPlay = (card) => {
     setTopCard(card);
     setCards((prev) =>
@@ -168,6 +184,10 @@ const GameContextProvider = ({ children }) => {
     }
     socket.emit("play_card", card);
     updateLocalStateAfterPlay(card);
+    if (!mute) {
+      moveSound();
+
+    }
   };
 
   const handleColorSelect = (color) => {
@@ -185,6 +205,7 @@ const GameContextProvider = ({ children }) => {
     green: "bg-green-500",
     yellow: "bg-yellow-500",
   };
+  console.log("cards", cards);
 
   const otherPlayers = count
     ? Object.entries(count || {}).filter(([id]) => id !== myId)
@@ -208,6 +229,12 @@ const GameContextProvider = ({ children }) => {
       setPlayableCards([]);
     }
   };
+  // gameSound()
+  // useEffect(() => {
+  //   if (!mute) {
+  //     gameSound();
+  //   }
+  // }, mute)
 
   useEffect(() => {
     const onConnect = () => setMyId(socket.id);
@@ -250,6 +277,8 @@ const GameContextProvider = ({ children }) => {
         handleColorSelect,
         colorMap,
         takeCard,
+        muteUnmute,
+        muteimg
       }}
     >
       {children}
