@@ -15,7 +15,9 @@ const ModeContextProvider = ({ children }) => {
   };
 
   return (
-    <ModeContext.Provider value={{ gamePage, showModel, showSetting }}>
+    <ModeContext.Provider
+      value={{ gamePage, showModel, showSetting, setShowModel }}
+    >
       {children}
     </ModeContext.Provider>
   );

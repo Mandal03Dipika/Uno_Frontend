@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import GameContext from "./GameContext";
 import socket from "../../../library/socket";
+
 import red0 from "../../../assets/red0.webp";
 import red1 from "../../../assets/red1.webp";
 import red2 from "../../../assets/red2.webp";
@@ -66,193 +67,86 @@ const GameContextProvider = ({ children }) => {
   const [topCard, setTopCard] = useState(null);
   const [currentPlayerId, setCurrentPlayerId] = useState(null);
   const [myId, setMyId] = useState(socket.id);
+  const [count, setCount] = useState();
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [pendingWildCard, setPendingWildCard] = useState(null);
 
   const getImage = (card) => {
-    if (card.color === "red") {
-      if (card.type === "number") {
-        switch (card.value) {
-          case 0:
-            return red0;
-          case 1:
-            return red1;
-          case 2:
-            return red2;
-          case 3:
-            return red3;
-          case 4:
-            return red4;
-          case 5:
-            return red5;
-          case 6:
-            return red6;
-          case 7:
-            return red7;
-          case 8:
-            return red8;
-          case 9:
-            return red9;
-          default:
-            break;
-        }
-      } else {
-        switch (card.value) {
-          case "skip":
-            return redSkip;
-          case "reverse":
-            return redReverse;
-          case "draw2":
-            return redDraw2;
-          default:
-            break;
-        }
-      }
-    } else if (card.color === "yellow") {
-      if (card.type === "number") {
-        switch (card.value) {
-          case 0:
-            return yellow0;
-          case 1:
-            return yellow1;
-          case 2:
-            return yellow2;
-          case 3:
-            return yellow3;
-          case 4:
-            return yellow4;
-          case 5:
-            return yellow5;
-          case 6:
-            return yellow6;
-          case 7:
-            return yellow7;
-          case 8:
-            return yellow8;
-          case 9:
-            return yellow9;
-          default:
-            break;
-        }
-      } else {
-        switch (card.value) {
-          case "skip":
-            return yellowSkip;
-          case "reverse":
-            return yellowReverse;
-          case "draw2":
-            return yellowDraw2;
-          default:
-            break;
-        }
-      }
-    } else if (card.color === "green") {
-      if (card.type === "number") {
-        switch (card.value) {
-          case 0:
-            return green0;
-          case 1:
-            return green1;
-          case 2:
-            return green2;
-          case 3:
-            return green3;
-          case 4:
-            return green4;
-          case 5:
-            return green5;
-          case 6:
-            return green6;
-          case 7:
-            return green7;
-          case 8:
-            return green8;
-          case 9:
-            return green9;
-          default:
-            break;
-        }
-      } else {
-        switch (card.value) {
-          case "skip":
-            return greenSkip;
-          case "reverse":
-            return greenReverse;
-          case "draw2":
-            return greenDraw2;
-          default:
-            break;
-        }
-      }
-    } else if (card.color === "blue") {
-      if (card.type === "number") {
-        switch (card.value) {
-          case 0:
-            return blue0;
-          case 1:
-            return blue1;
-          case 2:
-            return blue2;
-          case 3:
-            return blue3;
-          case 4:
-            return blue4;
-          case 5:
-            return blue5;
-          case 6:
-            return blue6;
-          case 7:
-            return blue7;
-          case 8:
-            return blue8;
-          case 9:
-            return blue9;
-          default:
-            break;
-        }
-      } else {
-        switch (card.value) {
-          case "skip":
-            return blueSkip;
-          case "reverse":
-            return blueReverse;
-          case "draw2":
-            return blueDraw2;
-          default:
-            break;
-        }
-      }
-    } else {
-      switch (card.value) {
-        case "wild":
-          return wild;
-        case "wild draw4":
-          return draw4;
-        default:
-          break;
-      }
-    }
+    const { color, type, value } = card;
+    const map = {
+      red: {
+        number: [red0, red1, red2, red3, red4, red5, red6, red7, red8, red9],
+        skip: redSkip,
+        reverse: redReverse,
+        draw2: redDraw2,
+      },
+      yellow: {
+        number: [
+          yellow0,
+          yellow1,
+          yellow2,
+          yellow3,
+          yellow4,
+          yellow5,
+          yellow6,
+          yellow7,
+          yellow8,
+          yellow9,
+        ],
+        skip: yellowSkip,
+        reverse: yellowReverse,
+        draw2: yellowDraw2,
+      },
+      green: {
+        number: [
+          green0,
+          green1,
+          green2,
+          green3,
+          green4,
+          green5,
+          green6,
+          green7,
+          green8,
+          green9,
+        ],
+        skip: greenSkip,
+        reverse: greenReverse,
+        draw2: greenDraw2,
+      },
+      blue: {
+        number: [
+          blue0,
+          blue1,
+          blue2,
+          blue3,
+          blue4,
+          blue5,
+          blue6,
+          blue7,
+          blue8,
+          blue9,
+        ],
+        skip: blueSkip,
+        reverse: blueReverse,
+        draw2: blueDraw2,
+      },
+    };
+
+    if (type === "wild") return value === "wild draw4" ? draw4 : wild;
+    if (type === "number") return map[color]?.number?.[value];
+    return map[color]?.[value];
   };
 
-  const myDeck = [];
-
-  cards.forEach((card) => {
-    const image = getImage(card);
-    myDeck.push({
-      color: card.color,
-      value: card.value,
-      type: card.type,
-      image: image,
-    });
-  });
+  const myDeck = cards.map((card) => ({
+    ...card,
+    image: getImage(card),
+  }));
 
   const playCard = topCard ? getImage(topCard) : null;
 
-  const handlePlayCard = (card) => {
-    socket.emit("play_card", card);
-    setTopCard({
-      color: card.color,
-      value: card.value,
-      type: card.type,
-    });
+  const updateLocalStateAfterPlay = (card) => {
+    setTopCard(card);
     setCards((prev) =>
       prev.filter(
         (c) =>
@@ -266,12 +160,62 @@ const GameContextProvider = ({ children }) => {
     setPlayableCards([]);
   };
 
+  const handlePlayCard = (card) => {
+    if (card.type === "wild") {
+      setPendingWildCard(card);
+      setShowColorPicker(true);
+      return;
+    }
+    socket.emit("play_card", card);
+    updateLocalStateAfterPlay(card);
+  };
+
+  const handleColorSelect = (color) => {
+    if (!pendingWildCard) return;
+    const updatedCard = { ...pendingWildCard, color };
+    socket.emit("set_color", { card: updatedCard, color });
+    updateLocalStateAfterPlay(updatedCard);
+    setPendingWildCard(null);
+    setShowColorPicker(false);
+  };
+
+  const colorMap = {
+    red: "bg-red-500",
+    blue: "bg-blue-500",
+    green: "bg-green-500",
+    yellow: "bg-yellow-500",
+  };
+
+  const otherPlayers = count
+    ? Object.entries(count || {}).filter(([id]) => id !== myId)
+    : null;
+
+  const playerPositions = [
+    {
+      className: "absolute w-96 -rotate-90 top-80 right-5",
+      name: "Player 2",
+    },
+    { className: "absolute w-96 rotate-180 top-32", name: "Player 3" },
+    {
+      className: "absolute w-96 rotate-90 left-5 top-80",
+      name: "Player 4",
+    },
+  ];
+
+  const takeCard = () => {
+    if (currentPlayerId === myId) {
+      socket.emit("take_card", (card) => console.log(card));
+      setPlayableCards([]);
+    }
+  };
+
   useEffect(() => {
     const onConnect = () => setMyId(socket.id);
     socket.on("connect", onConnect);
     socket.on("shuffled_card", (data) => setCards(data));
     socket.on("first_card", (card) => setTopCard(card));
     socket.on("card_played", ({ playerId, card }) => setTopCard(card));
+    socket.on("card_count", (count) => setCount(count));
     socket.on("your_turn", ({ playableCards, fullHand, topCard }) => {
       setCards(fullHand);
       setPlayableCards(playableCards);
@@ -293,7 +237,20 @@ const GameContextProvider = ({ children }) => {
 
   return (
     <GameContext.Provider
-      value={{ myDeck, playCard, playableCards, handlePlayCard }}
+      value={{
+        myDeck,
+        playCard,
+        playableCards,
+        handlePlayCard,
+        otherPlayers,
+        playerPositions,
+        showColorPicker,
+        setShowColorPicker,
+        setPendingWildCard,
+        handleColorSelect,
+        colorMap,
+        takeCard,
+      }}
     >
       {children}
     </GameContext.Provider>
