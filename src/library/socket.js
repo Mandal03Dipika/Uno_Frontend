@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8009");
+const socket = io("https://unobackend.wishalpha.com");
 
 socket.on("connect", () => {
   console.log("Connected to server:", socket.id);

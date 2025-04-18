@@ -70,6 +70,7 @@ const GameContextProvider = ({ children }) => {
   const [count, setCount] = useState();
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [pendingWildCard, setPendingWildCard] = useState(null);
+  const [uno, setUno] = useState(false);
 
   const getImage = (card) => {
     const { color, type, value } = card;
@@ -147,16 +148,24 @@ const GameContextProvider = ({ children }) => {
 
   const updateLocalStateAfterPlay = (card) => {
     setTopCard(card);
-    setCards((prev) =>
-      prev.filter(
-        (c) =>
-          !(
-            c.color === card.color &&
-            c.value === card.value &&
-            c.type === card.type
-          )
-      )
-    );
+    setCards((prev) => {
+      const index = prev.findIndex((c) => {
+        if (card.type === "wild" || card.type === "wild draw4") {
+          return c.type === card.type && c.value === card.value;
+        }
+        return (
+          c.color === card.color &&
+          c.value === card.value &&
+          c.type === card.type
+        );
+      });
+      if (index !== -1) {
+        const newHand = [...prev];
+        newHand.splice(index, 1);
+        return newHand;
+      }
+      return prev;
+    });
     setPlayableCards([]);
   };
 
@@ -173,7 +182,7 @@ const GameContextProvider = ({ children }) => {
   const handleColorSelect = (color) => {
     if (!pendingWildCard) return;
     const updatedCard = { ...pendingWildCard, color };
-    socket.emit("set_color", { card: updatedCard, color });
+    socket.emit("play_card", updatedCard);
     updateLocalStateAfterPlay(updatedCard);
     setPendingWildCard(null);
     setShowColorPicker(false);
@@ -204,8 +213,16 @@ const GameContextProvider = ({ children }) => {
 
   const takeCard = () => {
     if (currentPlayerId === myId) {
-      socket.emit("take_card", (card) => console.log(card));
+      socket.emit("take_card");
       setPlayableCards([]);
+    }
+  };
+
+  const hitUno = () => {
+    if (cards.length == 1) {
+      console.log("Uno");
+      setUno(true);
+      socket.emit("hit_uno");
     }
   };
 
@@ -224,6 +241,24 @@ const GameContextProvider = ({ children }) => {
     socket.on("turn_change", ({ currentPlayerId }) => {
       setCurrentPlayerId(currentPlayerId);
     });
+    socket.on("uno_penalty", ({ playerId, newHand }) => {
+      if (myId === playerId && cards.length === 1) {
+        console.log("Penalty 2 cards");
+        setCards(newHand);
+      }
+    });
+    socket.on("uno_called", ({ playerId }) => {
+      if (myId === playerId && cards.length === 1) {
+        console.log("UNO!");
+      }
+    });
+    socket.on("draw_card", ({ newHand, drawnCards }) => {
+      const updatedHand = newHand.map((c) => ({
+        ...c,
+        image: getImage(c),
+      }));
+      setCards(updatedHand);
+    });
 
     return () => {
       socket.off("connect", onConnect);
@@ -232,8 +267,13 @@ const GameContextProvider = ({ children }) => {
       socket.off("card_played");
       socket.off("your_turn");
       socket.off("turn_change");
+      socket.off("uno_penalty");
+      socket.off("uno_called");
+      socket.off("draw_card");
     };
   }, []);
+
+  console.log(currentPlayerId === myId ? "Your Turn" : "");
 
   return (
     <GameContext.Provider
@@ -250,6 +290,8 @@ const GameContextProvider = ({ children }) => {
         handleColorSelect,
         colorMap,
         takeCard,
+        hitUno,
+        uno,
       }}
     >
       {children}

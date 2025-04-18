@@ -14,6 +14,7 @@ function Game() {
     handleColorSelect,
     colorMap,
     takeCard,
+    hitUno,
   } = useGameContext();
   const { theme } = useThemeContext();
 
@@ -51,6 +52,7 @@ function Game() {
             src={uno}
             alt="uno-btn"
             className="h-12 animate-pulse delay-200 ease-in-out"
+            onClick={() => hitUno()}
           />
         </div>
         {otherPlayers?.map(([id, cardCount], i) => {
