@@ -7,7 +7,7 @@ import unoTheme2 from "../../assets/UNO theme 2.png";
 import useThemeContext from "../../context/features/useThemeContext";
 
 function Model() {
-  const { showSetting } = useModeContext();
+  const { showSetting, setShowModel } = useModeContext();
   const { changeTheme } = useThemeContext();
 
   return (
@@ -24,7 +24,7 @@ function Model() {
             <div className="flex space-x-4">
               <div
                 className="cursor-pointer rounded-lg overflow-hidden border-2 border-transparent hover:border-blue-500"
-                onClick={() => changeTheme(unoTheme1)}
+                onClick={() => changeTheme(unoTheme1) && setShowModel(false)}
               >
                 <img
                   src={unoTheme1}
@@ -34,7 +34,7 @@ function Model() {
               </div>
               <div
                 className="cursor-pointer rounded-lg overflow-hidden border-2 border-transparent hover:border-blue-500"
-                onClick={() => changeTheme(unoTheme2)}
+                onClick={() => changeTheme(unoTheme2) && setShowModel(false)}
               >
                 <img
                   src={unoTheme2}
@@ -44,7 +44,7 @@ function Model() {
               </div>
               <div
                 className="cursor-pointer rounded-lg overflow-hidden border-2 border-transparent hover:border-blue-500"
-                onClick={() => changeTheme(unoTheme3)}
+                onClick={() => changeTheme(unoTheme3) && setShowModel(false)}
               >
                 <img
                   src={unoTheme3}
