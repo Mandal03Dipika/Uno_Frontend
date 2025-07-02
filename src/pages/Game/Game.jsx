@@ -1,6 +1,7 @@
 import useGameContext from "./context/features/useGameContext";
 import uno from "../../assets/uno.png";
 import useThemeContext from "../../context/features/useThemeContext";
+import { motion } from "framer-motion";
 
 function Game() {
   const {
@@ -58,9 +59,8 @@ function Game() {
           return (
             <div key={id} className={className}>
               <h5
-                className={`relative bottom-3 font-bold ${
-                  name === "Player 3" ? "-rotate-180 right-80" : ""
-                }`}
+                className={`relative bottom-3 font-bold ${name === "Player 3" ? "-rotate-180 right-80" : ""
+                  }`}
               >
                 {name}
               </h5>
@@ -90,16 +90,33 @@ function Game() {
                   p.value === card.value &&
                   p.type === card.type
               );
+
               return (
-                <img
+                <motion.img
                   key={index}
+                  initial={{
+                    x: 0,
+                    y: -300,
+                    rotate: -10,
+                    scale: 0.5,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    x: index * 25,
+                    y: isPlayable ? 5 : 22,
+                    rotate: 0,
+                    scale: 1,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20,
+                    delay: index * 0.05,
+                  }}
                   src={card.image}
                   alt={`${card.color} ${card.value}`}
                   className={`h-28 absolute transition-all duration-200 ease-in-out hover:scale-110 hover:cursor-pointer`}
-                  style={{
-                    left: `${index * 25}px`,
-                    top: isPlayable ? "5px" : "22px",
-                  }}
                   onClick={() => {
                     if (!isPlayable) return;
                     handlePlayCard(card);
@@ -107,6 +124,7 @@ function Game() {
                 />
               );
             })}
+
           </div>
         </div>
         {showColorPicker && (
